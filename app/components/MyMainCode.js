@@ -122,11 +122,6 @@ export default function MyMainCode() {
     rimLight.castShadow = false;
     scene.add(rimLight);
 
-    // // Strong point light placed at Sun position so planets catch direct light
-    // const sunLight = new THREE.PointLight(0xfff7e8, 1.8, 2000, 2);
-    // sunLight.position.set(0, 0, 0);
-    // scene.add(sunLight);
-
     // Small fill light behind camera
     const backLight = new THREE.PointLight(0xffffff, 0.25, 1500);
     backLight.position.set(0, -200, -500);
@@ -535,8 +530,6 @@ export default function MyMainCode() {
                 if (!m) return;
 
                 if (m.isMeshStandardMaterial || m.isMeshPhysicalMaterial) {
-                  // SUN KE LIYE SPECIAL CASE
-                  // ❌ Sun ke liye koi special effect nahi
                   if (!m.isMeshStandardMaterial && !m.isMeshPhysicalMaterial)
                     return;
 
