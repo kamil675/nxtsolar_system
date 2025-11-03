@@ -1,26 +1,207 @@
-@import "tailwindcss";
-
+@font-face {
+  font-family: "NeueHaasDisplay";
+  src: url("/neue-haas-grotesk-display-pro-cufonfonts/NeueHaasDisplaymediu.ttf")
+    format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "NeueHaasDisplay1";
+  src: url("/neue-haas-grotesk-display-pro-cufonfonts/NeueHaasDisplayLight.ttf")
+    format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #000;
+}
+:root {
+  --bg: #000;
+}
+* {
+  box-sizing: border-box;
+}
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+}
+#loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10000;
+  background: black;
+}
+#loaderCanvas {
+  width: 300px !important;
+  height: 300px !important;
+}
+#loading-bar-container {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+#loading-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ffaa00, #ffd700);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+#topText {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "NeueHaasDisplay", Arial, sans-serif;
+  font-size: clamp(12px, 6vw, 120px);
+  font-weight: 600;
+  z-index: 9600 !important;
+  pointer-events: auto !important;
+  user-select: none;
+  white-space: nowrap;
+  cursor: default;
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: center;
+  line-height: 1;
+  -webkit-user-drag: none;
+
+  /* === PURE WHITE 3D TEXT - CLEAN & CRISP === */
+  color: #ffffff;
+  text-shadow: 0 1px 0 #f0f0f0, 0 2px 0 #e0e0e0, 0 3px 0 #d0d0d0,
+    0 4px 0 #c0c0c0, 0 5px 0 #b0b0b0, 0 6px 0 #a0a0a0, 0 7px 0 #909090,
+    0 8px 0 #808080, 0 9px 0 #707070, 0 10px 15px rgba(0, 0, 0, 0.4),
+    0 15px 25px rgba(0, 0, 0, 0.3), 0 20px 35px rgba(0, 0, 0, 0.2);
+
+  /* Remove gradient & transparent fill - we want SOLID WHITE */
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #ffffff !important; /* Force pure white */
+
+  /* Extra clarity on dark backgrounds */
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+#topText.hovered {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+#topText span,
+#weAreSpan span,
+#solarText span {
+  will-change: transform, opacity;
+  display: inline-block;
+  backface-visibility: hidden;
+}
+#solarText {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-family: "NeueHaasDisplay", sans-serif;
+  font-size: clamp(12px, 4vw, 80px);
+  font-weight: bold;
+  z-index: 9000;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+}
+.corner-text {
+  position: fixed;
+  font-family: "NeueHaasDisplay1", sans-serif;
+  font-weight: 100;
+  color: white;
+  z-index: 9500;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  font-size: clamp(14px, 2.5vw, 28px);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.corner-text.left {
+  top: 20vh;
+  left: 3vw;
+  transform: translateY(20px);
+}
+
+.corner-text.right {
+  top: 20vh;
+  right: 5vw;
+  transform: translateY(20px);
+}
+
+.corner-text span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px);
+  will-change: transform, opacity;
+}
+#videoSection {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  pointer-events: none;
+  visibility: visible;
+}
+#astronautVideo {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  visibility: visible;
+  transition: opacity 0.6s linear;
+}
+canvas,
+.three-canvas {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  z-index: 9000; /* pehle 7000 tha */
+  pointer-events: auto;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0;
+  transition: opacity 0.3s linear;
+}
+.planet-label {
+  color: white;
+  font-family: NeueHaasDisplay, Arial, sans-serif;
+  font-size: clamp(10px, 1.2vw, 16px);
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 0 0 5px black;
+}
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 768px) {
+  #scrollContainer {
+    height: 1200vh;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  #solarText {
+    font-size: clamp(10px, 3.5vw, 60px);
+  }
 }
