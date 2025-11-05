@@ -28,11 +28,21 @@ export default function MyMainCode() {
       </div>
       <div id="topText"></div>
       <div id="solarText"></div>
-      <div id="welcomeText" class="corner-text left"></div>
-    <div id="solarIntroText" class="corner-text right"></div>
-    
+      <div id="welcomeText" class="corner-text left">
+  <div class="corner-box left">
+    <div class="corner-content"></div>
+  </div>
+</div>
+
+<div id="solarIntroText" class="corner-text right">
+  <div class="corner-box right">
+    <div class="corner-content"></div>
+  </div>
+</div>
+
+
       <div id="videoSection">
-        <video id="astronautVideo" src="/textures/models/video.mp4" type="video/mp4"
+        <video class="bgVideo" id="astronautVideo" src="/textures/models/video.mp4" type="video/mp4"
         muted
         playsinline
         webkit-playsinline
@@ -106,29 +116,33 @@ export default function MyMainCode() {
     controls.enablePan = false;
 
     // lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.15));
-    const fillLight1 = new THREE.PointLight(0xffffff, 0.3, 2000);
+    // --- LIGHTING (updated: brighter + sun light) ---
+    scene.add(new THREE.AmbientLight(0xffffff, 0.22)); // slightly brighter ambient
+
+    const fillLight1 = new THREE.PointLight(0xffffff, 0.45, 2500);
     fillLight1.position.set(500, 200, 500);
     scene.add(fillLight1);
-    const fillLight2 = new THREE.PointLight(0xffffff, 0.25, 2000);
+
+    const fillLight2 = new THREE.PointLight(0xffffff, 0.35, 2000);
     fillLight2.position.set(-400, -200, -300);
     scene.add(fillLight2);
-    // --- EXTRA LIGHTS to brighten planets ---
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x404040, 0.35)); // soft fill
+
+    // Stronger hemisphere for overall visibility
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x404040, 0.6)); // brighter soft fill
 
     // Rim / key light from camera direction (gives visible highlights)
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.9);
     rimLight.position.set(0, 200, 400);
     rimLight.castShadow = false;
     scene.add(rimLight);
 
     // Small fill light behind camera
-    const backLight = new THREE.PointLight(0xffffff, 0.25, 1500);
+    const backLight = new THREE.PointLight(0xffffff, 0.45, 1500);
     backLight.position.set(0, -200, -500);
     scene.add(backLight);
 
     // Slightly increase renderer exposure
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 1.1;
 
     // === NEW STARS: SEPARATE SCENE + RENDERER (LIKE CompleteNext) ===
     const starsScene = new THREE.Scene();
@@ -331,104 +345,146 @@ export default function MyMainCode() {
     let currentProgress = 0; // Global for text parallax
 
     function showTextAnimation() {
-      const text = "Hey, we are Fynix";
+      const text = "Hey,we are Fynix";
+      const topText = document.getElementById("topText");
+      const bgVideo = document.querySelector(".bgVideo"); // ✅ video class selector
+
       topText.innerHTML = "";
-      const parts = text.split(", we are");
+
+      const parts = text.split(",we are");
       const before = parts[0];
-      const after = ", we are ";
+      const after = ",we are ";
       const last = parts[1];
+
+      const heySpan = document.createElement("span");
+      heySpan.id = "heySpan";
+      heySpan.style.display = "inline-block";
 
       const weAreSpan = document.createElement("span");
       weAreSpan.id = "weAreSpan";
       weAreSpan.style.display = "inline-block";
-      weAreSpan.style.whiteSpace = "nowrap";
 
-      before.split("").forEach((char) => {
+      const fynixSpan = document.createElement("span");
+      fynixSpan.id = "fynixSpan";
+      fynixSpan.style.display = "inline-block";
+
+      // Create animated spans
+      before.split("").forEach((ch) => {
         const span = document.createElement("span");
-        span.textContent = char === " " ? "\u00A0" : char;
+        span.textContent = ch === " " ? "\u00A0" : ch;
         span.style.opacity = 0;
         span.style.transform = "translateY(30px)";
-        span.style.display = "inline-block";
-        topText.appendChild(span);
+        heySpan.appendChild(span);
       });
-
-      after.split("").forEach((char) => {
+      after.split("").forEach((ch) => {
         const span = document.createElement("span");
-        span.textContent = char === " " ? "\u00A0" : char;
+        span.textContent = ch === " " ? "\u00A0" : ch;
         span.style.opacity = 0;
         span.style.transform = "translateY(30px)";
-        span.style.display = "inline-block";
         weAreSpan.appendChild(span);
       });
-      topText.appendChild(weAreSpan);
-
-      last.split("").forEach((char) => {
+      last.split("").forEach((ch) => {
         const span = document.createElement("span");
-        span.textContent = char;
+        span.textContent = ch;
         span.style.opacity = 0;
         span.style.transform = "translateY(30px)";
-        span.style.display = "inline-block";
-        topText.appendChild(span);
+        fynixSpan.appendChild(span);
       });
 
-      topSpans = Array.from(topText.querySelectorAll("span"));
-      weAreSpans = Array.from(
-        document.getElementById("weAreSpan").querySelectorAll("span")
-      );
+      topText.append(heySpan, weAreSpan, fynixSpan);
 
-      gsap.to(topText, { opacity: 1, duration: 0.5, ease: "power2.out" });
+      // Animate text appearance
+      const topSpans = topText.querySelectorAll("span");
       gsap.to(topSpans, {
         opacity: 1,
         y: 0,
         stagger: 0.08,
         ease: "power2.out",
-        duration: 0.6,
-        delay: 0.3,
-        onStart: () => {
-          topSpans.forEach((s) => {
-            s.style.transform = "translateY(0)";
-          });
-        },
+        duration: 0.5,
       });
 
-      // 🔥 EXACT SAME 3D PARALLAX EFFECT AS HTML VERSION 🔥
+      // Base shadow
+      topText.style.filter =
+        "drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf)";
+      topText.style.transition = "filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
+
+      // Shadow on hover
+      heySpan.addEventListener("mouseenter", () => {
+        topText.style.filter =
+          "drop-shadow(1px 0 0 #bfbfbf) drop-shadow(3px 0 0 #bfbfbf) drop-shadow(5px 0 0 #bfbfbf)";
+      });
+      heySpan.addEventListener("mouseleave", () => {
+        topText.style.filter =
+          "drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf)";
+      });
+
+      fynixSpan.addEventListener("mouseenter", () => {
+        topText.style.filter =
+          "drop-shadow(-1px 0 0 #bfbfbf) drop-shadow(-3px 0 0 #bfbfbf) drop-shadow(-5px 0 0 #bfbfbf)";
+      });
+      fynixSpan.addEventListener("mouseleave", () => {
+        topText.style.filter =
+          "drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf)";
+      });
+
+      // ✅ Optimized Parallax + Smooth Scroll
       let isHovering = false;
+      let videoX = 0,
+        videoY = 0;
+      let targetX = 0,
+        targetY = 0;
+      let parallaxFrame = null; // track animation frame
 
-      // Mouse Enter/Leave (same as HTML)
-      topText.addEventListener("mouseenter", () => {
+      function startParallax() {
+        if (parallaxFrame) return; // already running
+        function animate() {
+          videoX += (targetX - videoX) * 0.08;
+          videoY += (targetY - videoY) * 0.08;
+          gsap.set(bgVideo, { x: videoX, y: videoY });
+          parallaxFrame = requestAnimationFrame(animate);
+        }
+        parallaxFrame = requestAnimationFrame(animate);
+      }
+
+      function stopParallax() {
+        if (parallaxFrame) {
+          cancelAnimationFrame(parallaxFrame);
+          parallaxFrame = null;
+        }
+        gsap.to(bgVideo, { x: 0, y: 0, duration: 0.8, ease: "power3.out" });
+      }
+
+      weAreSpan.addEventListener("mouseenter", () => {
         isHovering = true;
-        topText.classList.add("hovered");
+        startParallax();
       });
 
-      topText.addEventListener("mouseleave", () => {
+      weAreSpan.addEventListener("mouseleave", () => {
         isHovering = false;
-        topText.classList.remove("hovered");
-        const videoProgress = Math.min(Math.max(currentProgress / 0.5, 0), 1);
-        const heyFynixProgress = Math.max((videoProgress - 0.25) / 0.75, 0);
-        const scale = 1 - heyFynixProgress * 0.5;
+        stopParallax();
+        topText.style.transform =
+          "translateX(-50%) rotateX(0deg) rotateY(0deg)";
       });
 
-      // 🔥 MAIN MOUSEMOVE - EXACT SAME AS HTML 🔥
-      const mouseMoveHandler = (e) => {
+      document.addEventListener("mousemove", (e) => {
         if (!isHovering) return;
 
-        const rect = topText.getBoundingClientRect();
+        const rect = weAreSpan.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const deltaX = e.clientX - centerX;
         const deltaY = e.clientY - centerY;
 
-        // EXACT SAME VALUES AS HTML
         const moveX = deltaX * 0.008;
         const moveY = deltaY * 0.008;
         const rotateY = deltaX * 0.0015;
         const rotateX = -deltaY * 0.0015;
 
-        topText.style.transform = `translateX(-50%) translate(${moveX}px, ${moveY}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1)`;
-      };
+        topText.style.transform = `translateX(-50%) translate(${moveX}px, ${moveY}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-      topText.addEventListener("mousemove", mouseMoveHandler);
-      mouseMoveHandlerGlobalRef.current = mouseMoveHandler;
+        targetX = moveX * 3;
+        targetY = moveY * 3;
+      });
     }
 
     function initSolarText() {
@@ -445,11 +501,13 @@ export default function MyMainCode() {
         if (lineIndex === 0) {
           lineDiv.style.fontSize = "2em";
           lineDiv.style.fontWeight = "900";
-          lineDiv.style.letterSpacing = "0.04em";
+          lineDiv.style.fontStyle = "italic";
+          lineDiv.style.letterSpacing = "8px";
         } else {
           lineDiv.style.fontSize = "1.2em";
           lineDiv.style.fontWeight = "400";
-          lineDiv.style.letterSpacing = "0.02em";
+          lineDiv.style.fontStyle = "italic";
+          lineDiv.style.letterSpacing = "1px";
         }
 
         line.split("").forEach((char) => {
@@ -472,15 +530,21 @@ export default function MyMainCode() {
       const welcomeText = document.getElementById("welcomeText");
       const solarIntroText = document.getElementById("solarIntroText");
 
+      const welcomeBox = welcomeText.querySelector(".corner-box.left");
+      const solarBox = solarIntroText.querySelector(".corner-box.right");
+
+      // get corner-content inside
+      const welcomeContent = welcomeBox.querySelector(".corner-content");
+      const solarContent = solarBox.querySelector(".corner-content");
+
       const welcomeLines = [
-        "Every idea stars small",
-        "We nurtune it into orbit",
+        "Every idea starts small",
+        "We nurture it into orbit",
       ];
-      const solarLines = ["Big vision need space.We", "give then galaxies"];
+      const solarLines = ["Big visions need space.", "We give them galaxies"];
 
       function createText(container, lines) {
         container.innerHTML = "";
-
         const linesArray = Array.isArray(lines) ? lines : [lines];
 
         linesArray.forEach((line, lineIndex) => {
@@ -489,10 +553,8 @@ export default function MyMainCode() {
           lineDiv.style.textAlign = "center";
           lineDiv.style.width = "100%";
           lineDiv.style.margin = "0 auto";
-
-          // Gap kam: 0.2em → 0.1em (ya 0.05em bhi kar sakte ho)
           lineDiv.style.marginBottom =
-            lineIndex < linesArray.length - 1 ? "0.01em" : "0";
+            lineIndex < linesArray.length - 1 ? "0.1em" : "0";
 
           line.split("").forEach((char) => {
             const span = document.createElement("span");
@@ -507,15 +569,15 @@ export default function MyMainCode() {
         });
       }
 
-      createText(welcomeText, welcomeLines);
-      createText(solarIntroText, solarLines);
+      createText(welcomeContent, welcomeLines);
+      createText(solarContent, solarLines);
 
-      // Cache all spans
-      window.welcomeSpans = Array.from(welcomeText.querySelectorAll("span"));
+      window.welcomeSpans = Array.from(welcomeContent.querySelectorAll("span"));
       window.solarIntroSpans = Array.from(
-        solarIntroText.querySelectorAll("span")
+        solarContent.querySelectorAll("span")
       );
     }
+
     function loadPlanetModel(planet) {
       gltfLoader.load(
         `/textures/models/${planet.file}`,

@@ -13,6 +13,9 @@
   font-style: normal;
 }
 :root {
+  --font-inter: "Inter", Arial, sans-serif;
+}
+:root {
   --bg: #000;
 }
 :root {
@@ -61,40 +64,42 @@ html,
   top: 40%;
   left: 50%;
   transform: translateX(-50%);
-  font-family: "NeueHaasDisplay", Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif !important;
   font-size: clamp(12px, 6vw, 120px);
   font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -5px;
   z-index: 9600 !important;
   pointer-events: auto !important;
   user-select: none;
   white-space: nowrap;
-  cursor: default;
-  opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  opacity: 1;
   text-align: center;
   line-height: 1;
   -webkit-user-drag: none;
 
-  /* === PURE WHITE 3D TEXT - CLEAN & CRISP === */
-  color: #ffffff;
-  text-shadow: 0 1px 0 #f0f0f0, 0 2px 0 #e0e0e0, 0 3px 0 #d0d0d0,
-    0 4px 0 #c0c0c0, 0 5px 0 #b0b0b0, 0 6px 0 #a0a0a0, 0 7px 0 #909090,
-    0 8px 0 #808080, 0 9px 0 #707070, 0 10px 15px rgba(0, 0, 0, 0.4),
-    0 15px 25px rgba(0, 0, 0, 0.3), 0 20px 35px rgba(0, 0, 0, 0.2);
-
-  /* Remove gradient & transparent fill - we want SOLID WHITE */
-  background: none !important;
-  -webkit-background-clip: initial !important;
-  -webkit-text-fill-color: #ffffff !important; /* Force pure white */
-
-  /* Extra clarity on dark backgrounds */
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
+  /* Softer shadow */
+  filter: drop-shadow(0 0 0 #bfbfbf) drop-shadow(0 0 0 #bfbfbf)
+    drop-shadow(0 0 0 #bfbfbf);
+  transition: filter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#topText.hovered {
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+/* Hover for "Hey" → subtle left shift */
+#topText.hover-hey {
+  filter: drop-shadow(1 0 0 #bfbfbf) drop-shadow(3 0 0 #bfbfbf)
+    drop-shadow(5 0 0 #bfbfbf);
 }
 
+/* Hover for "Fynix" → subtle right shift */
+#topText.hover-fynix {
+  filter: drop-shadow(1 0 0 #bfbfbf) drop-shadow(3 0 0 #bfbfbf)
+    drop-shadow(5 0 0 #bfbfbf);
+}
+.bgVideo {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
 #topText span,
 #weAreSpan span,
 #solarText span {
@@ -108,48 +113,125 @@ html,
   left: 50%;
   transform: translateX(-50%);
   color: white;
-  font-family: "NeueHaasDisplay", sans-serif;
+  font-family: "Inter", Arial, sans-serif !important;
   font-size: clamp(12px, 4vw, 80px);
-  font-weight: bold;
+  font-weight: 900;
   z-index: 9000;
   pointer-events: none;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
+  text-align: center;
+  line-height: 1.1;
 }
 .corner-text {
   position: fixed;
-  font-family: "NeueHaasDisplay1", sans-serif;
-  font-weight: 100;
-  color: white;
-  z-index: 9500;
+  font-weight: 200; /* thinner text */
+  color: rgba(226, 223, 223, 0.7); /* slightly lighter color */
+  z-index: 9999;
+  font-family: "Inter", Arial, sans-serif !important;
   pointer-events: none;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.6s ease, transform 0.6s ease;
-  font-size: clamp(14px, 2.5vw, 28px);
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+  font-size: clamp(11px, 1.8vw, 20px);
+  text-shadow: none;
 }
 
+/* position */
 .corner-text.left {
   top: 20vh;
   left: 3vw;
   transform: translateY(20px);
 }
-
 .corner-text.right {
   top: 20vh;
   right: 5vw;
   transform: translateY(20px);
 }
 
+/* Base box */
+.corner-box {
+  position: relative;
+  display: inline-block;
+  border: 2px solid rgba(167, 165, 165, 0.25);
+  border-radius: 25px;
+  padding: 20px 20px;
+  background: rgb(17, 17, 17);
+  box-shadow: none;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  z-index: 999999; /* 🔝 above stars */
+}
+
+/* Tilt directions */
+.corner-box.left {
+  transform: skew(-25deg);
+}
+.corner-box.right {
+  transform: skew(25deg);
+}
+
+/* Inner wrapper keeps text straight */
+.corner-content {
+  display: inline-block;
+  transform: skew(25deg);
+}
+.corner-box.right .corner-content {
+  transform: skew(-25deg);
+}
+
+/* Black circular background behind quote */
+.corner-box::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42px;
+  height: 42px;
+  background: black;
+  border-radius: 50%;
+  box-shadow: none;
+  z-index: 1;
+}
+
+/* White quote image */
+.corner-box.left::after,
+.corner-box.right::after {
+  content: "";
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 35px;
+  background: url("/quates.png") no-repeat center/contain;
+  filter: brightness(0) invert(0.3);
+  z-index: 2;
+}
+
+/* Flip horizontally for right corner */
+.corner-box.left::after {
+  transform: translateX(-50%) scaleX(-1);
+}
+
+/* Hover effect — subtle only */
+.corner-box:hover {
+  transform: translateY(-3px) scale(1.03);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+/* Animated spans */
 .corner-text span {
   display: inline-block;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   will-change: transform, opacity;
+  z-index: 100;
 }
+
 #videoSection {
   position: fixed;
   inset: 0;
